@@ -45,8 +45,12 @@ def main():
         for f in files:
             filepath = subdir + os.sep + f
             subpath = os.path.relpath(subdir, args.path)
+            if subpath == ".":
+                subpath = f
+            else:
+                subpath = subpath + os.sep + f
             with open(filepath, "r") as f_instance:
-                instance = {"name": subpath + os.sep + f, "body": f_instance.read()}
+                instance = {"name": subpath, "body": f_instance.read()}
                 instances.append(instance)
     if args.verbose:
         print("Uploading {} instances.".format(len(instances)))
