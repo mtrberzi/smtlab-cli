@@ -59,7 +59,7 @@ def main():
         if args.verbose:
             for inst in chunk:
                 print(inst["name"])
-        r = requests.post(args.endpoint + "/benchmarks/{}".format(benchmark_id), json=instances)
+        r = requests.post(args.endpoint + "/benchmarks/{}".format(benchmark_id), json=chunk)
         if r.status_code != requests.codes.ok:
             print(r.json())
             r.raise_for_status()
