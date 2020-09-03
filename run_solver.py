@@ -105,7 +105,7 @@ def interact(args):
     
     print("Enter an optional description for this run: ", end="")
     sys.stdout.flush()
-    run_parameters['description'] = sys.stdin.readline()
+    run_parameters['description'] = sys.stdin.readline().strip()
 
     return run_parameters
 
