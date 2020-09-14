@@ -17,11 +17,14 @@ def main():
     parser.add_argument('--endpoint', help="Base URL of API endpoint", default="http://127.0.0.1:5000")
     parser.add_argument("name", help="name of the benchmark to upload")
     parser.add_argument("path", help="path to benchmark folder; all .smt2 files under this path will be uploaded")
+
+    username = os.environ['SMTLAB_USERNAME']
+    password = os.environ['SMTLAB_PASSWORD']
     
     args = parser.parse_args()
     benchmark_id = None
     if args.id:
-        r = requests.get(args.endpoint + "/benchmarks/{}".format(args.id))
+        r = requests.get(args.endpoint + "/benchmarks/{}".format(args.id), auth=(username,password))
         if r.status_code != requests.codes.ok:
             print(r.json())
             r.raise_for_status()
@@ -31,7 +34,7 @@ def main():
         benchmark_id = args.id
     else:
         new_benchmark_rq = {'name': args.name}
-        r = requests.post(args.endpoint + "/benchmarks", json=new_benchmark_rq)
+        r = requests.post(args.endpoint + "/benchmarks", json=new_benchmark_rq, auth=(username,password))
         if r.status_code != requests.codes.ok:
             print(r.json())
             r.raise_for_status()
@@ -59,7 +62,7 @@ def main():
         if args.verbose:
             for inst in chunk:
                 print(inst["name"])
-        r = requests.post(args.endpoint + "/benchmarks/{}".format(benchmark_id), json=chunk)
+        r = requests.post(args.endpoint + "/benchmarks/{}".format(benchmark_id), json=chunk, auth=(username,password))
         if r.status_code != requests.codes.ok:
             print(r.json())
             r.raise_for_status()

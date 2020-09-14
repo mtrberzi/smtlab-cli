@@ -16,13 +16,16 @@ def main():
     parser.add_argument("name", help="name of the solver to upload")
     parser.add_argument("path", help="path to solver binary")
 
+    username = os.environ['SMTLAB_USERNAME']
+    password = os.environ['SMTLAB_PASSWORD']
+
     args = parser.parse_args()
     new_solver_rq = {'name': args.name, 'validation_solver': args.validation}
     if args.arguments:
         new_solver_rq['default_arguments'] = args.arguments
     with open(args.path, 'rb') as solver_file:
         new_solver_rq['base64_binary'] = base64.b64encode(solver_file.read()).decode('ascii')
-    r = requests.post(args.endpoint + "/solvers", json=new_solver_rq)
+    r = requests.post(args.endpoint + "/solvers", json=new_solver_rq, auth=(username, password))
     if r.status_code != requests.codes.ok:
         print(r.json())
         r.raise_for_status()

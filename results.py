@@ -3,18 +3,22 @@
 import argparse
 import requests
 import sys
+import os
+
+username = os.environ['SMTLAB_USERNAME']
+password = os.environ['SMTLAB_PASSWORD']
 
 def interact_get_run_id(args):
     # first fetch benchmark names and solver names
-    r = requests.get(args.endpoint + "/benchmarks")
+    r = requests.get(args.endpoint + "/benchmarks", auth=(username,password))
     r.raise_for_status()
     benchmark_info = r.json()
-    r = requests.get(args.endpoint + "/solvers")
+    r = requests.get(args.endpoint + "/solvers", auth=(username,password))
     r.raise_for_status()
     solver_info = r.json()
     
     print("Fetching list of runs from the server.")
-    r = requests.get(args.endpoint + "/runs")
+    r = requests.get(args.endpoint + "/runs", auth=(username,password))
     if r.status_code != requests.codes.ok:
         print(r.json())
         r.raise_for_status()
@@ -34,7 +38,7 @@ def interact_get_run_id(args):
             if solver['id'] == run['solver_id']:
                 solver_name = solver['name']
                 break
-        print(f"{benchmark['id']}: {solver_name} / {benchmark_name} : {run['arguments']} ({run['description'].strip()})")
+        print(f"{benchmark['id']}: {solver_name} / {benchmark_name} : {run['arguments']} ({run['description'].strip()}) {run['start_date']}")
         valid_ids.append(run['id'])
     print("")
     while True:
@@ -51,23 +55,23 @@ def interact_get_run_id(args):
             print("Please enter an integer.")
 
 def display_run(args, run_id):
-    r = requests.get(args.endpoint + f"/runs/{run_id}")
+    r = requests.get(args.endpoint + f"/runs/{run_id}", auth=(username,password))
     r.raise_for_status()
     run_info = r.json()
 
-    r = requests.get(args.endpoint + f"/benchmarks/{run_info['benchmark_id']}")
+    r = requests.get(args.endpoint + f"/benchmarks/{run_info['benchmark_id']}", auth=(username,password))
     r.raise_for_status()
     benchmark_info = r.json()
 
-    r = requests.get(args.endpoint + f"/solvers/{run_info['solver_id']}")
+    r = requests.get(args.endpoint + f"/solvers/{run_info['solver_id']}", auth=(username,password))
     r.raise_for_status()
     solver_info = r.json()
 
-    r = requests.get(args.endpoint + f"/benchmarks/{run_info['benchmark_id']}/instances")
+    r = requests.get(args.endpoint + f"/benchmarks/{run_info['benchmark_id']}/instances", auth=(username,password))
     r.raise_for_status()
     benchmark_instances_info = r.json()
 
-    r = requests.get(args.endpoint + f"/runs/{run_id}/results")
+    r = requests.get(args.endpoint + f"/runs/{run_id}/results", auth=(username,password))
     r.raise_for_status()
     result_info = r.json()
 

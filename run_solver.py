@@ -3,6 +3,11 @@
 import argparse
 import requests
 import sys
+import os
+import json
+
+username = os.environ["SMTLAB_USERNAME"]
+password = os.environ["SMTLAB_PASSWORD"]
 
 def prompt_yes_or_no(prompt):
     while True:
@@ -29,7 +34,7 @@ def interact(args):
         run_parameters['benchmark_id'] = args.benchmark
     else:
         print("Fetching list of benchmarks from the server.")
-        r = requests.get(args.endpoint + "/benchmarks")
+        r = requests.get(args.endpoint + "/benchmarks", auth=(username,password))
         if r.status_code != requests.codes.ok:
             print(r.json())
             r.raise_for_status()
@@ -60,7 +65,7 @@ def interact(args):
         run_parameters['solver_id'] = args.solver
     else:
         print("Fetching list of solvers from the server.")
-        r = requests.get(args.endpoint + "/solvers")
+        r = requests.get(args.endpoint + "/solvers", auth=(username,password))
         if r.status_code != requests.codes.ok:
             print(r.json())
             r.raise_for_status()
@@ -94,7 +99,7 @@ def interact(args):
     if custom_arguments:
         custom_args = []
         while True:
-            print("Enter arguments, one per line, or a blank line to stop: ", end="")
+            print(f"Enter arguments, one per line, or a blank line to stop {custom_args}: ", end="")
             sys.stdout.flush()
             response = sys.stdin.readline().strip()
             if response == "":
@@ -125,7 +130,7 @@ def main():
         # TODO
         pass
 
-    r = requests.post(args.endpoint + "/runs", json=run_parameters)
+    r = requests.post(args.endpoint + "/runs", json=run_parameters, auth=(username,password))
     if r.status_code != requests.codes.ok:
         print(r.json())
         r.raise_for_status()
