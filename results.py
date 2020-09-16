@@ -38,7 +38,7 @@ def interact_get_run_id(args):
             if solver['id'] == run['solver_id']:
                 solver_name = solver['name']
                 break
-        print(f"{benchmark['id']}: {solver_name} / {benchmark_name} : {run['arguments']} ({run['description'].strip()}) {run['start_date']}")
+        print(f"{run['id']}: {solver_name} / {benchmark_name} : {run['arguments']} ({run['description'].strip()}) {run['start_date']}")
         valid_ids.append(run['id'])
     print("")
     while True:
@@ -109,11 +109,56 @@ def display_run(args, run_id):
             
     print(f"SAT: {nSAT} UNSAT: {nUNSAT} TIMEOUT: {nTIMEOUT} UNKNOWN: {nUNKNOWN} ERROR: {nERROR}")
     print(f"Total time: {totalRunTime:.3f} seconds (without timeouts: {totalRunTime_withoutTimeouts:.3f} seconds)")
+    print()
+    print("Detailed results:")
+    print()
+
+    nValidationIssues = 0
     
+    for instance in benchmark_instances_info:
+        for result in result_info:
+            if result['instance_id'] == instance['id']:
+                instanceTime = float(result['runtime']) * 0.001
+                r = requests.get(args.endpoint + f"/results/{result['id']}", auth=(username,password))
+                r.raise_for_status()
+                detailed_result_info = r.json()
+                validations = detailed_result_info['validations']
+                nValidations = len(validations)
+                nValidationsOK = 0
+                errorValidations = []
+                for validation in validations:
+                    if 'result' in validation:
+                        if validation['result'] == 'unsat' and result['result'] == 'sat':
+                            errorValidations.append(validation)
+                        else:
+                            nValidationsOK += 1
+                    elif 'validation' in validation:
+                        if validation['validation'] == 'invalid':
+                            errorValidations.append(validation)
+                        else:
+                            nValidationsOK += 1
+                print(f"{instance['name']}: {result['result']} ({instanceTime:.3f} seconds) ({nValidationsOK}/{nValidations} without error)")
+                if result['result'] == 'error':
+                    print(detailed_result_info['stdout'])
+                if errorValidations:
+                    nValidationIssues += 1
+                    for errorValidation in errorValidations:
+                        for solver in solver_info:
+                            if errorValidation['solver_id'] == solver['id']:
+                                solverName = solver['name']
+                                break
+                        if 'result' in errorValidation:
+                            rText = errorValidation['result']
+                        elif 'validation' in errorValidation:
+                            rText = errorValidation['validation']
+                        print(f"- {solverName}: {rText}")
+
+    print()
+    print(f"{nValidationIssues} instances had validation issues.")
 
 def main():
     parser = argparse.ArgumentParser(description="Get results of SMTLab benchmark runs")
-    parser.add_argument('--endpoint', help="Base URL of API endpoint", default="http://127.0.0.1:5000")
+    parser.add_argument('--endpoint', help="Base URL of API endpoint", default=os.environ['SMTLAB_API_ENDPOINT'])
     parser.add_argument('-i', '--interactive', default=False, action="store_true", help="Display results interactively")
     parser.add_argument("run_id", nargs='?', type=int, default=-1)
 

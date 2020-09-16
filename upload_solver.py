@@ -10,7 +10,7 @@ import base64
 def main():
     parser = argparse.ArgumentParser(description="Upload solver binary to SMTLab")
     parser.add_argument('--verbose', action='store_true', default=False)
-    parser.add_argument('--endpoint', help="Base URL of API endpoint", default="http://127.0.0.1:5000")
+    parser.add_argument('--endpoint', help="Base URL of API endpoint", default=os.environ['SMTLAB_API_ENDPOINT'])
     parser.add_argument('--arguments', help="Default command-line arguments for solver")
     parser.add_argument('--validation', action='store_true', default=False, help="Mark this solver as a validation solver")
     parser.add_argument("name", help="name of the solver to upload")

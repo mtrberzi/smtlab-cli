@@ -19,7 +19,7 @@ def mkpasswd(length=32):
     
 def main():
     parser = argparse.ArgumentParser(description='Create an SMTLab user')
-    parser.add_argument('--endpoint', help="Base URL of API endpoint", default="http://127.0.0.1:5000")
+    parser.add_argument('--endpoint', help="Base URL of API endpoint", default=os.environ['SMTLAB_API_ENDPOINT'])
     parser.add_argument('-r', '--role', type=str, default=None, help="Role (quick permissions) for account: readonly, user, admin, scheduler, worker")
     parser.add_argument('-p', '--password', default=False, action='store_true', help="Prompt for password (otherwise, randomly generate one)")
     parser.add_argument('username', type=str, help="Username of the new account")

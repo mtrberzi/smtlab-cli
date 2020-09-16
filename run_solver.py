@@ -116,7 +116,7 @@ def interact(args):
 
 def main():
     parser = argparse.ArgumentParser(description="Run benchmarks on SMTLab")
-    parser.add_argument('--endpoint', help="Base URL of API endpoint", default="http://127.0.0.1:5000")
+    parser.add_argument('--endpoint', help="Base URL of API endpoint", default=os.environ['SMTLAB_API_ENDPOINT'])
     parser.add_argument("-i", "--interactive", default=False, action="store_true", help="Choose run parameters interactively")
     parser.add_argument("-s", "--solver", type=int, help="ID of solver to run")
     parser.add_argument("-b", "--benchmark", type=int, help="ID of benchmark to run")
