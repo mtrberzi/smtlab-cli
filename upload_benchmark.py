@@ -13,7 +13,7 @@ def chunks(lst, n):
 def main():
     parser = argparse.ArgumentParser(description="Upload SMT2 benchmarks to SMTLab")
     parser.add_argument('--id', help="ID number of existing benchmark to add to")
-    parser.add_argument('--verbose', action='store_true')
+    parser.add_argument('-v', '--verbose', default=False, action='store_true')
     parser.add_argument('--endpoint', help="Base URL of API endpoint", default=os.environ['SMTLAB_API_ENDPOINT'])
     parser.add_argument("name", help="name of the benchmark to upload")
     parser.add_argument("path", help="path to benchmark folder; all .smt2 files under this path will be uploaded")
