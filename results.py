@@ -63,7 +63,7 @@ def display_run(args, run_id):
     r.raise_for_status()
     benchmark_info = r.json()
 
-    r = requests.get(args.endpoint + f"/solvers/{run_info['solver_id']}", auth=(username,password))
+    r = requests.get(args.endpoint + f"/solvers", auth=(username,password))
     r.raise_for_status()
     solver_info = r.json()
 
@@ -75,7 +75,13 @@ def display_run(args, run_id):
     r.raise_for_status()
     result_info = r.json()
 
-    print(f"Run {run_info['id']}: {solver_info['name']} / {benchmark_info['name']}")
+    this_solver_name = "???"
+    for solver in solver_info:
+        if solver['id'] == run_info['solver_id']:
+            this_solver_name = solver['name']
+            break
+    
+    print(f"Run {run_info['id']}: {this_solver_name} / {benchmark_info['name']}")
     print(f"{len(result_info)} results / {len(benchmark_instances_info)} instances in this benchmark")
 
     # collect summary
